@@ -18,7 +18,6 @@ On Windows
 git clone https://github.com/cinamonsalts/restclt.git
 cd restclt
 ./gradlew.bat build
-java -jar restclt-app/build/libs/restclt-app-0.1.0-all.jar web-scenario.groovy
 ```
 
 ## Usage

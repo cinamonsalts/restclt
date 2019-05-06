@@ -1,8 +1,6 @@
 package restclt.client.httpclient4
 
 import groovy.json.JsonOutput
-import groovy.transform.CompileStatic
-import groovy.transform.TypeChecked
 import groovy.util.logging.Log
 import org.apache.http.Header
 import org.apache.http.HttpHost
@@ -24,7 +22,6 @@ import restclt.client.RestClient
 
 
 @Log
-@TypeChecked
 class HttpClient4RestClient implements RestClient{
 
     @Override
@@ -113,13 +110,14 @@ class HttpClient4RestClient implements RestClient{
     private Response convert(CloseableHttpResponse httpResponse) {
         Response response = new Response()
         response.status = httpResponse.getStatusLine().statusCode
-        Object headerMap = Arrays.asList(httpResponse.allHeaders).inject(new HashMap<String, List<String>>()) { Map<String, List<String>> result, Header header ->
-            log.fine("Header: ${header.name} -> ${header.value}")
-            List<String> valuesList = result.getOrDefault("${header.name}",[])
-            valuesList.push("${header.value}" as String)
-            result.put("${header.name}" as String, valuesList)
+        log.info("Returned status code: ${response.status}")
+        response.headers = httpResponse.allHeaders.inject([:]) { result, header ->
+            log.info("Header: ${header.name} -> ${header.value}")
+            log.info("Current result: ${result}")
+            def valuesList = result.getOrDefault("${header.name}",[])
+            valuesList.push("${header.value}")
+            result << ["${header.name}": valuesList]
         }
-        response.headers = headerMap as Map
         response.body = org.apache.http.util.EntityUtils.toString(httpResponse.entity)
         return response
     }
